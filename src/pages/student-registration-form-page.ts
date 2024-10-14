@@ -1,7 +1,7 @@
-import { PageObject } from '../pages/pageObject';
-import { Routes } from '../utils/routes';
 import { faker } from '@faker-js/faker';
 import { Page } from '@playwright/test';
+import { PageObject } from '../pages/pageObject';
+import { Routes } from '../utils/routes';
 
 export const user = {
     firstName: faker.person.firstName(),
@@ -27,12 +27,16 @@ export class RegistrationPage extends PageObject {
     readonly sportsCheckbox = this.get('hobbies-checkbox-1');
     readonly readingCheckbox = this.get('hobbies-checkbox-2');
     readonly musicCheckbox = this.get('hobbies-checkbox-3');
-    readonly addressInput = this.get('currentAddress');
-    readonly stateSelect = this.get('react-select-3-input');
-    readonly citySelect = this.get('react-select-4-input');
+    readonly uploadPictureButton = this.get('uploadPicture');
+    readonly currentAddressInput = this.get('currentAddress');
+    readonly stateSelect = this.get('state');
+    readonly citySelect = this.get('city');
     readonly submitButton = this.get('submit');
     readonly closeLargeModal = this.get('closeLargeModal');
     readonly successRegistrationModal = this.locator('[class*="modal-content"]');
+    readonly table = this.locator('.table-responsive table');
+    readonly rows = this.table.locator('tbody tr');
+
 
     constructor(page: Page) {
         super(page);
@@ -46,10 +50,14 @@ export class RegistrationPage extends PageObject {
         await this.userForm.waitFor();
     }
 
-    async fillMinimumUserForm() {
+    async fillUserForm() {
         await this.firstNameInput.fill(user.firstName);
         await this.lastNameInput.fill(user.lastName);
+        await this.userEmailInput.fill(user.email);
         await this.maleRadio.click({ force: true });
         await this.userNumberInput.fill(String(user.mobile));
+        // await this.dateOfBirthInput.fill(String(user.dateOfBirth));
+        await this.subjectsInput.fill(user.subjects);
+        await this.sportsCheckbox.check({ force: true });
     }
 }
