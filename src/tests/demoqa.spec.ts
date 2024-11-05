@@ -4,8 +4,6 @@ import { expect } from '@playwright/test';
 import { checkColor } from '../utils/colorsChecker';
 import { defaultColor, errorColor, successColor } from '../utils/colors';
 
-// const {test, expect} = require("@playwright/test");
-
 const test = apiTest.extend<{ registrationPage: RegistrationPage }>({
     registrationPage: async ({ page }, use) => {
         const registrationPage = new RegistrationPage(page);
@@ -18,42 +16,41 @@ test.beforeEach(async ({ registrationPage }) => {
 });
 
 test.describe('Регистрания пользователя', () => {
-    test('Минимальное количество полей для регистрации', async ({ registrationPage }) => {
+    test('1. Проверка формы регистрации', async ({ registrationPage }) => {
         await registrationPage.fillUserForm();
         await registrationPage.submitButton.click();
         await expect(registrationPage.successRegistrationModal).toBeVisible();
         await registrationPage.table.waitFor();
-        const rows = await registrationPage.rows.all();
-        const expectedValues = [
-            { label: 'Student Name', value: user.firstName },
-            { label: 'Student Email', value: user.email },
-            { label: 'Gender', value: 'Male' },
-            { label: 'Mobile', value: `${user.mobile}` },
-            { label: 'Date of Birth', value: '14 October,2024' },
-            { label: 'Subjects', value: '' },
-            { label: 'Hobbies', value: '' },
-            { label: 'Picture', value: 'picture.jpg' },
-            { label: 'Address', value: '' },
-            { label: 'State and City', value: '' },
-        ];
-
-        for (const row of rows) {
-            const index = rows.indexOf(row);
-            expect(await row.locator('td:nth-child(1)').textContent()).toContain(expectedValues[index].label);
-            expect(await row.locator('td:nth-child(2)').textContent()).toContain(expectedValues[index].value);
-        }
-
-
-        // expect(await rows[0].locator('td:nth-child(2)').textContent()).toContain(user.firstName);
-        // expect(await rows[3].locator('td:nth-child(2)').textContent()).toContain(user.mobile);
+        await verifyRegistrationData(registrationPage, user);
     });
 
-    test('Проверка пустой формы', async ({ registrationPage }) => {
+    test('2. Проверка пустой формы', async ({ registrationPage }) => {
         await registrationPage.submitButton.click();
         await checkEmptyForm(registrationPage);
     });
 });
 
+async function verifyRegistrationData(registrationPage: RegistrationPage, user: any) {
+    const rows = await registrationPage.rows.all();
+    const expectedValues = [
+        { label: 'Student Name', value: user.firstName },
+        { label: 'Student Email', value: user.email },
+        { label: 'Gender', value: 'Male' },
+        { label: 'Mobile', value: `${user.mobile}` },
+        { label: 'Date of Birth', value: user.dateOfBirth },
+        { label: 'Subjects', value: user.subjects },
+        { label: 'Hobbies', value: user.hobbies },
+        { label: 'Picture', value: user.picture },
+        { label: 'Address', value: user.currentAddress },
+        { label: 'State and City', value: user.stateAndCity },
+    ];
+
+    for (const row of rows) {
+        const index = rows.indexOf(row);
+        expect(await row.locator('td:nth-child(1)').textContent()).toContain(expectedValues[index].label);
+        expect(await row.locator('td:nth-child(2)').textContent()).toContain(expectedValues[index].value);
+    }
+}
 
 async function checkEmptyForm(page: RegistrationPage) {
     await expect(page.firstNameInput).toBeEmpty();
@@ -75,7 +72,7 @@ async function checkEmptyForm(page: RegistrationPage) {
     await expect(page.otherRadio).not.toBeChecked();
     // await checkColor(page.otherRadio, 'border-color', errorColor);
 
-    await expect(page.dateOfBirthInput).toHaveValue('14 Oct 2024');
+    await expect(page.dateOfBirthInput).toHaveValue('17 Oct 2024');
     await checkColor(page.dateOfBirthInput, 'border-color', successColor);
 
     await expect(page.subjectsInput).toHaveValue('');

@@ -24,6 +24,14 @@ export class PageObject {
             : this.page.locator(selector, options);
     }
 
+    async selectOption(optionLocator: Locator, optionName: string, index = 0) {
+        await optionLocator.click();
+        await this.get(`select-option:${optionName}`)
+            .nth(index)
+            .scrollIntoViewIfNeeded();
+        await this.get(`select-option:${optionName}`).nth(index).click();
+    }
+
     input(testId: string | RegExp, parent?: Locator): Locator {
         return this.get(testId, parent).locator('input');
     }

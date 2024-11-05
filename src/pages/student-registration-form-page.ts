@@ -2,15 +2,20 @@ import { faker } from '@faker-js/faker';
 import { Page } from '@playwright/test';
 import { PageObject } from '../pages/pageObject';
 import { Routes } from '../utils/routes';
+import { uploadFile } from '../utils/fileUploader';
+
 
 export const user = {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     email: faker.internet.email(),
     mobile: faker.number.int({ min: 1000000000, max: 9999999999 }),
-    dateOfBirth: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
-    subjects: faker.lorem.words(10),
+    dateOfBirth: new Date(faker.date.recent({ days: 1000 })).toLocaleString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).replace(/(\d+) (\w+) (\d+)/, '$1 $2,$3'),
+    subjects: 'English',
     currentAddress: faker.lorem.words(10),
+    hobbies: 'Sports',
+    picture: 'picture.jpg',
+    stateAndCity: 'NCR Delhi',
 };
 
 export class RegistrationPage extends PageObject {
@@ -36,6 +41,9 @@ export class RegistrationPage extends PageObject {
     readonly successRegistrationModal = this.locator('[class*="modal-content"]');
     readonly table = this.locator('.table-responsive table');
     readonly rows = this.table.locator('tbody tr');
+    readonly subjectRow = this.get('react-select-2-option-0');
+    readonly statePool = this.get('react-select-3-option-0');
+    readonly cityPool = this.get('react-select-4-option-0');
 
 
     constructor(page: Page) {
@@ -56,8 +64,15 @@ export class RegistrationPage extends PageObject {
         await this.userEmailInput.fill(user.email);
         await this.maleRadio.click({ force: true });
         await this.userNumberInput.fill(String(user.mobile));
-        // await this.dateOfBirthInput.fill(String(user.dateOfBirth));
+        await this.dateOfBirthInput.fill(String(user.dateOfBirth));
         await this.subjectsInput.fill(user.subjects);
+        await this.subjectRow.click();
         await this.sportsCheckbox.check({ force: true });
+        await uploadFile('picture.jpg', this.uploadPictureButton, this.page);
+        await this.currentAddressInput.fill(user.currentAddress);
+        await this.stateSelect.click();
+        await this.statePool.click();
+        await this.citySelect.click();
+        await this.cityPool.click();
     }
 }
