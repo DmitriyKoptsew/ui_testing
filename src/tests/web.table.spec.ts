@@ -64,11 +64,10 @@ test.describe('Редактирование и поиск строки', () => {
 
     test('6 Поиск строки', async ({ webTablePage }) => {
         await webTablePage.searchInput.fill(user.firstName);
-        await webTablePage.page.waitForTimeout(5);
+        await expect(webTablePage.tableGrid).toContainText(user.firstName);
         const rows = webTablePage.tableGrid.locator('.rt-tr');
-        const filledRows = rows.filter();
-        await expect(filledRows).toHaveCount(1);
-
+        const filteredRows = rows.filter({ hasText: user.firstName });
+        await expect(filteredRows).toHaveCount(1);
     });
 });
 
@@ -84,6 +83,43 @@ test.describe('Удаление строки', () => {
     test('7 Удаление строки', async ({ webTablePage }) => {
         await webTablePage.deleteRecord.click();
         await expect(webTablePage.tableGrid).not.toContainText(user.firstName);
+    });
+});
+
+test.describe('Пагинация', () => {
+    let webTablePage: WebTablePage;
+    test.beforeEach(async ({ webTablePage: page }) => {
+        webTablePage = page;
+        await webTablePage.goto();
+        for (let i = 0; i < 8; i++) {
+            await webTablePage.addUser();
+        }
+    });
+
+    test('8 Следующая страница', async ({ webTablePage }) => {
+        await expect(webTablePage.totalPages).toContainText('2');
+        // await expect(webTablePage.previousPage).toBeDisabled();
+        await webTablePage.nextPage.click();
+        await expect(webTablePage.selectedPage).toHaveValue('2');
+        // await expect(webTablePage.nextPage).toBeDisabled();
+        // await expect(webTablePage.previousPage).toBeEnabled();
+    });
+
+    test('9 Предыдущая страница', async ({ webTablePage }) => {
+        await expect(webTablePage.totalPages).toContainText('2');
+        // await expect(webTablePage.previousPage).toBeDisabled();
+        await webTablePage.nextPage.click();
+        await webTablePage.previousPage.click();
+        await expect(webTablePage.selectedPage).toHaveValue('1');
+        // await expect(webTablePage.nextPage).toBeDisabled();
+        // await expect(webTablePage.previousPage).toBeEnabled();
+    });
+
+    test('10 Перейти на конкретную страницу', async ({ webTablePage }) => {
+        await expect(webTablePage.totalPages).toContainText('2');
+        await webTablePage.selectedPage.fill('2');
+        await webTablePage.page.press( '', 'Enter');
+        await expect(webTablePage.selectedPage).toHaveValue('2');
     });
 });
 

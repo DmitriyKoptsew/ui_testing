@@ -2,8 +2,6 @@ import { faker } from '@faker-js/faker';
 import { Page } from '@playwright/test';
 import { PageObject } from '../pages/pageObject';
 import { Routes } from '../utils/routes';
-import { uploadFile } from '../utils/fileUploader';
-
 
 export const user = {
     firstName: faker.person.firstName(),
@@ -28,7 +26,11 @@ export class WebTablePage extends PageObject {
     readonly editRecord = this.get('edit-record-4');
     readonly deleteRecord = this.get('delete-record-4');
     readonly tableGrid = this.locator('[class*="rt-tbody"]');
+    readonly nextPage = this.locator('[class*="-next"]');
+    readonly previousPage = this.locator('[class*="-previous"]');
+    readonly totalPages = this.locator('[class*="-totalPages"]');
     readonly selectRows = this.locator('[aria-label*="rows per page"]');
+    readonly selectedPage = this.locator('[aria-label*="jump to page"]');
 
 
     constructor(page: Page) {
