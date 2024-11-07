@@ -118,7 +118,7 @@ test.describe('Пагинация', () => {
     test('10 Перейти на конкретную страницу', async ({ webTablePage }) => {
         await expect(webTablePage.totalPages).toContainText('2');
         await webTablePage.selectedPage.fill('2');
-        await webTablePage.page.press( '', 'Enter');
+        await webTablePage.page.press( 'input', 'Enter');
         await expect(webTablePage.selectedPage).toHaveValue('2');
     });
 });

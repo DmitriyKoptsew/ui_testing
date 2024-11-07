@@ -72,7 +72,7 @@ async function checkEmptyForm(page: RegistrationPage) {
     await expect(page.otherRadio).not.toBeChecked();
     // await checkColor(page.otherRadio, 'border-color', errorColor);
 
-    await expect(page.dateOfBirthInput).toHaveValue('17 Oct 2024');
+    await expect(page.dateOfBirthInput).toHaveValue('07 Nov 2024');
     await checkColor(page.dateOfBirthInput, 'border-color', successColor);
 
     await expect(page.subjectsInput).toHaveValue('');
